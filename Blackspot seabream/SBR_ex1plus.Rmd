@@ -1,5 +1,5 @@
 ---
-title: "SPiCTing with Strait of Gibraltar blackspot seabream target fishery data (Spain and Morocco) - Exercise 1"
+title: "SPiCTing with Strait of Gibraltar blackspot seabream target fishery data (Spain and Morocco) - Exercise 1+"
 author: "J. Gil"
 date: "`r Sys.Date()`"
 output:
@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ##Data used
-A long time-series of species catch  and nominal effort by year (1983-2018).
+A long time-series of species catch  and nominal effort by year (1983-2018) and including a short series of biomass index (2009-2018)
 
 ##Loading required Packages
 ```{r, eval=TRUE}
@@ -30,112 +30,118 @@ Landings came from Spain and Morocco are in tons by year (1983-2018)
 Effort instead of CPUE (nominal effort: nº sales, Spanish ones corrected from VMS data since 1997)
 ```{r, eval=TRUE}
 dir()
-dat1 <- read.xls("sbr_yearlydata.xls")
+dat1plus <- read.xls("sbr_yearlydata.xls")
 ```
 
 ##"inp" for the SPiCT model. 
 ```{r, eval=TRUE}
-inp1 <- list(timeC = dat1[,1],
-            obsC = dat1[,2],
-            timeE = dat1[,1], 
-            obsE = dat1[,5])
-inp1 <- check.inp(inp1)
+inp1plus <- list(timeC = dat1plus[,1],
+            obsC = dat1plus[,2],
+            timeI = dat1plus[,1]+ 0.5,  
+            obsI = dat1plus[,3],
+            timeE = dat1plus[,1], 
+            obsE = dat1plus[,5])
+inp1plus <- check.inp(inp1plus)
 ```
 
 ##Plotting data inputs
 ```{r}
-plotspict.data(inp1)
-plotspict.ci(inp1) ##Advanced plots
+plotspict.data(inp1plus)
+plotspict.ci(inp1plus) ##Advanced plots
 ```
-Advanced plots are the same because there´s no Index, rigth?
+Advanced plots error:
+"Error in base.checks(inp$obsE, inp$timeE, inp$stdevfacE, "E") : Time and observation vector do not match in length for E series"
 
 ##Fitting the model
 ```{r}
-fit1 <- fit.spict(inp1)
+fit1plus <- fit.spict(inp1plus)
 ```
 
 ##Summary
 ```{r}
-capture.output(summary(fit1))
+capture.output(summary(fit1plus))
 ```
 
 #Plotting outputs
 ```{r}
-plot(fit1)
+plot(fit1plus)
 ```
 Quite uncertain but converge
 
 ##Alternate model: fixing to Schaefer model
 ```{r}
-inp2 <- inp1
-inp2$phases$logn <- -1
-inp2$ini$logn <- log(2)
-inp2$priors$logn <- c(0,0,0)
+inp2plus <- inp1plus
+inp2plus$phases$logn <- -1
+inp2plus$ini$logn <- log(2)
+inp2plus$priors$logn <- c(0,0,0)
 
-fit2 <- fit.spict(inp2)
+fit2plus <- fit.spict(inp2plus)
 
-plot(fit2)
+plot(fit2plus)
 
-capture.output(summary(fit2))
+capture.output(summary(fit2plus))
 ```
-No improving at all :-(
+Not a huge improve :-(
 
 # Checklist for the acceptance of a SPiCT assessment 
 
 - 1: Convergence 
 ```{r}
-fit1$opt$convergence 
-fit2$opt$convergence 
+fit1plus$opt$convergence 
+fit2plus$opt$convergence 
 ```
 Both models converge :-)
 
 - 2: All variance parameters are finite 
 ```{r}
-all(is.finite(fit1$sd))  
-all(is.finite(fit2$sd))  
+all(is.finite(fit1plus$sd))  
+all(is.finite(fit2plus$sd))  
 ```
 TRUE in both models :-)
 
 - 3: No violation of model assumptions 
 ```{r}
-res1 <- calc.osa.resid(fit1)
-plotspict.diagnostic(res1)
-res2 <- calc.osa.resid(fit2)
-plotspict.diagnostic(res2)
+res1plus <- calc.osa.resid(fit1plus)
+plotspict.diagnostic(res1plus)
+res2plus <- calc.osa.resid(fit2plus)
+plotspict.diagnostic(res2plus)
 ```
-Shapiro p-value significant in catches from both models (normality of the residuals)!!
+Shapiro p-value significant in catches from Schaefer model (normality of the residuals)!! 
+Model 1+ all in green :-)
 
 - 4: Consistent patterns in the Retrospective Analysis
 ```{r}
-rep1=retro(fit1, nretroyear=5)
-plotspict.retro(rep1)
-rep2=retro(fit2, nretroyear=5)
-plotspict.retro(rep2)
+rep1plus=retro(fit1plus, nretroyear=5)
+plotspict.retro(rep1plus)
+rep2plus=retro(fit2plus, nretroyear=5)
+plotspict.retro(rep2plus)
 ```
-Not so bad :-)
+Last assessment quite different in model 1+ :-( 
+Also in model 2+, mostly in absolute values (B and F)
 
 - 5. Realistic production curve
 ```{r}
-calc.bmsyk(fit1)
-calc.bmsyk(fit2) # ALTERNATE Schaefer fix (0.5)
+calc.bmsyk(fit1plus)
+calc.bmsyk(fit2plus) # ALTERNATE Schaefer fix (0.5)
 ```
-0.7370801 in model 1 :-(
+0.7408798 in model 1 :-(
 
 - 6. High assessment uncertainty can indicate a lack of contrast in the input data or violation of
 the ecological model assumptions
 ```{r}
-calc.om(fit1)
-calc.om(fit2)
+calc.om(fit1plus)
+calc.om(fit2plus)
 ```
-B/Bmsy confidence intervals order magnitude= 2 in model 2 :-( 
+F/Fmsy confidence intervals order magnitude= 3  in model 1+ :-( 
+B/Bmsy confidence intervals order magnitude= 2  in model 2+ :-( 
 
 - 7. Initial values do not influence the parameter estimates
 ```{r}
-check.ini(inp1, ntrials=33)
-check.ini(inp2, ntrials=33)
+check.ini(inp1plus, ntrials=33)
+check.ini(inp2plus, ntrials=33)
 ```
-4 trials (from 33) didn´t converge in model 1. Distance close to zero in $resmat
-4 trials (from 33) didn´t converge in model 2. Distance in $resmat is 0.22 in one trial
+3 trials (from 33) didn´t converge in model 1+. Distance close to zero (0.01 and 0.02 in certain trials) in $resmat
+All trials (from 33)  converge in model 2+. Distance in $resmat is 0.10 in one trial
 
 # Extract values in TABLE format
 Preparing TABLE format
@@ -166,13 +172,13 @@ xtab<-function(x,caption='Table X.', file=stdout(), width='"100%"', cornername='
 
 Then choose the model and its values can be extracted with these tables:
 ```{r}
-Tab1 <- sumspict.parest(fit1); Tab1
-Tab2 <- sumspict.srefpoints(fit1);Tab2
-Tab3 <- sumspict.states(fit1);Tab3
-Tab4 <- sumspict.predictions(fit1);Tab4
-Tab1_Sfix <- sumspict.parest(fit2); Tab1_Sfix
-Tab2_Sfix <- sumspict.srefpoints(fit2);Tab2_Sfix
-Tab3_Sfix <- sumspict.states(fit2);Tab3_Sfix
-Tab4_Sfix <- sumspict.predictions(fit2);Tab4_Sfix
+Tab1 <- sumspict.parest(fit1plus); Tab1
+Tab2 <- sumspict.srefpoints(fit1plus);Tab2
+Tab3 <- sumspict.states(fit1plus);Tab3
+Tab4 <- sumspict.predictions(fit1plus);Tab4
+Tab1_Sfix <- sumspict.parest(fit2plus); Tab1_Sfix
+Tab2_Sfix <- sumspict.srefpoints(fit2plus);Tab2_Sfix
+Tab3_Sfix <- sumspict.states(fit2plus);Tab3_Sfix
+Tab4_Sfix <- sumspict.predictions(fit2plus);Tab4_Sfix
 ```
 
