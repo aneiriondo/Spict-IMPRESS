@@ -1,0 +1,103 @@
+---
+title: "Spict"
+author: "Marta Cousido"
+date: "28/9/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Loading the libraries.
+#install.packages("remotes")
+#install_github("DTUAqua/spict/spict")
+```{r}
+library(spict)
+library(icesAdvice)
+```
+
+
+# Simulating our population (example manual)
+
+
+```{r}
+set.seed(31415926)
+
+inp <- list(ini=list(logK=log(100), logm=log(10), logq=log(1),
+logbkfrac=log(1), logF0=log(0.3), logsdc=log(0.1),
+logsdf=log(0.3)))
+inp
+sim <- sim.spict(inp, nobs=30)
+plotspict.data(sim)
+```
+
+Comparing real catches vs input catches:
+
+
+```{r}
+names(sim)
+c1=sim$obsC
+c_per=sim$obsC+runif(30,-1,1)
+
+c2=sim$true$C
+
+plot(c1,type="b", main="Catches: real (black) and input (red/blue)",col="red",ylab="Catch",xlab="Time",pch=19)
+lines(c2)
+points(c2,pch=19)
+lines(c_per,col="blue")
+points(c_per,col="blue",pch=19)
+```
+
+
+Comparing index vs real biomass:
+
+
+
+```{r}
+
+I1=sim$obsI[[1]]
+I_per=I1+runif(30,-3,3)
+I2=sim$true$I[[1]]
+
+plot(I1,type="b", main="Biomass: real (red) and input (red/blue)",col="red",ylab="Index",xlab="Time",pch=19)
+lines(I2)
+points(I2,pch=19)
+lines(I_per,col="blue")
+points(I_per,col="blue",pch=19)
+```
+
+```{r}
+
+inp1=list(obsC=sim$obsC,obsI=sim$obsI,timeC=sim$timeC,timeI=sim$timeI,
+          true=sim$true)
+
+
+res1 <- fit.spict(inp1)
+sumspict.parest(res1)
+```
+```{r}
+
+inp2=list(obsC=c_per,obsI=I_per,timeC=sim$timeC,timeI=sim$timeI,
+          true=sim$true)
+
+
+res2 <- fit.spict(inp2)
+sumspict.parest(res2)
+```
+
+```{r}
+par(mfcol=c(1,2))
+plotspict.biomass(res1)
+plotspict.biomass(res2)
+
+plotspict.f(res1, qlegend=FALSE)
+plotspict.f(res2, qlegend=FALSE)
+
+plotspict.bbmsy(res1)
+plotspict.bbmsy(res2)
+
+plotspict.ffmsy(res1)
+plotspict.ffmsy(res2)
+```
