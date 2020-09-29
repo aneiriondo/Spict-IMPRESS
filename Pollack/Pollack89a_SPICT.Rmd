@@ -1,8 +1,11 @@
 ---
-title: "Pollack in ICES divisions 89a"
+title: "Pollack in ICES Divisions 89a"
 author: "Paz Sampedro"
 date: "`r Sys.Date()`"
-output: pdf_document
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -78,7 +81,7 @@ plotspict.ci(pol89a)
 ### Model Fitting 
 
 #### Run 1. Default priors and all parameters estimated
- No converged. Model did not obtain proper convergence!
+ Not converged. Model did not obtain proper convergence!
 
 ```{r results='hide', message=FALSE, warning=FALSE}
 res_pol89aDefault <- fit.spict(pol89a)
@@ -86,7 +89,7 @@ res_pol89aDefault <- fit.spict(pol89a)
 
 #### Run 2. Shorten Catch series to 2005-2018, overlapping with abundance index.
 
-No converged. Shorten series gave totally unrealistic estimates, testing different configurations:
+Not converged. Shorten series gave totally unrealistic estimates, testing different configurations:
 
 ```{r results='hide', message=FALSE, warning=FALSE}
 pol89aShorten = shorten.inp(pol89a, 2005, 2018)
