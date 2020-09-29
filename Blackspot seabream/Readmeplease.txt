@@ -9,6 +9,9 @@ Anyway, we´d like to deal with this fishery as a sort of "management unit" (spe
 	-Ex.2 (SBR_ex2.Rmd): Short time series by quarter (2009-2018) with landings and a biomass index proxy (Spanish standardized CPUE from VMS data)
 	-Ex.3 (SBR_ex3.Rmd): Previous exercises max-mix ;-)
 
+Ex.1 could also be attemped using biomass index (since 2009), not only effort data (SBR_ex1plus.Rmd) but
+don´t show huge improvement
+
 Ex.2 could also be attemped using effort data, not only biomass index (SBR_ex2plus.Rmd) but
 don´t show huge improvement
 

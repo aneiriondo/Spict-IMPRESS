@@ -170,9 +170,9 @@ Tab1 <- sumspict.parest(fit1); Tab1
 Tab2 <- sumspict.srefpoints(fit1);Tab2
 Tab3 <- sumspict.states(fit1);Tab3
 Tab4 <- sumspict.predictions(fit1);Tab4
-Tab1_Sfix <- sumspict.parest(fit1); Tab1_Sfix
-Tab2_Sfix <- sumspict.srefpoints(fit1);Tab2_Sfix
-Tab3_Sfix <- sumspict.states(fit1);Tab3_Sfix
-Tab4_Sfix <- sumspict.predictions(fit1);Tab4_Sfix
+Tab1_Sfix <- sumspict.parest(fit2); Tab1_Sfix
+Tab2_Sfix <- sumspict.srefpoints(fit2);Tab2_Sfix
+Tab3_Sfix <- sumspict.states(fit2);Tab3_Sfix
+Tab4_Sfix <- sumspict.predictions(fit2);Tab4_Sfix
 ```
 
